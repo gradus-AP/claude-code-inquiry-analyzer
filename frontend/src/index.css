@@ -1,0 +1,162 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f0f2f5;
+  color: #1a1a2e;
+  font-size: 14px;
+}
+
+h2 { font-size: 1rem; font-weight: 600; margin-bottom: 12px; color: #374151; }
+
+.dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+header h1 { font-size: 1.1rem; font-weight: 700; color: #111827; }
+
+.period-btns { display: flex; gap: 6px; }
+.period-btns button {
+  padding: 4px 12px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #374151;
+}
+.period-btns button.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+
+.card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+/* KPIRow */
+.kpi-row { display: flex; gap: 12px; }
+.kpi-card {
+  flex: 1;
+  background: #fff;
+  border-radius: 8px;
+  padding: 14px 18px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+.kpi-card .label { font-size: 12px; color: #6b7280; margin-bottom: 4px; }
+.kpi-card .value { font-size: 1.6rem; font-weight: 700; color: #111827; }
+.kpi-card .value.danger { color: #dc2626; }
+.kpi-card .value.warn  { color: #d97706; }
+
+/* ABCTable */
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 7px 10px; text-align: left; border-bottom: 1px solid #f3f4f6; }
+th { font-size: 12px; color: #6b7280; font-weight: 600; }
+.badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.badge-A { background: #fef3c7; color: #92400e; }
+.badge-B { background: #dbeafe; color: #1e40af; }
+.badge-C { background: #f3f4f6; color: #6b7280; }
+
+/* RiskList */
+.risk-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+.risk-item:last-child { border-bottom: none; }
+.risk-badge {
+  width: 36px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 0;
+  border-radius: 4px;
+}
+.risk-高 { background: #fee2e2; color: #dc2626; }
+.risk-中 { background: #fef3c7; color: #d97706; }
+.risk-低 { background: #d1fae5; color: #059669; }
+.risk-info { flex: 1; }
+.risk-info .name { font-weight: 600; font-size: 13px; }
+.risk-info .reason { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+/* ServiceChangeLog */
+.change-item {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 13px;
+}
+.change-item:last-child { border-bottom: none; }
+.change-date { color: #6b7280; white-space: nowrap; font-size: 12px; width: 80px; }
+
+/* InquiryTable */
+.filters { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.filters select, .filters input {
+  padding: 5px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #374151;
+}
+.status-解決済み { color: #059669; }
+.status-対応中   { color: #d97706; }
+.status-エスカレーション { color: #dc2626; }
+
+/* AnalysisModal */
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+}
+.modal {
+  background: #fff;
+  border-radius: 10px;
+  padding: 24px 28px;
+  width: 480px;
+  max-width: 95vw;
+}
+.modal h3 { font-size: 1rem; margin-bottom: 16px; }
+.steps { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.step {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; border-radius: 6px;
+  font-size: 13px;
+}
+.step.done    { background: #d1fae5; color: #065f46; }
+.step.active  { background: #dbeafe; color: #1e40af; }
+.step.waiting { background: #f9fafb; color: #9ca3af; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 8px; }
+.btn { padding: 7px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; border: none; }
+.btn-primary { background: #2563eb; color: #fff; }
+.btn-secondary { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; }

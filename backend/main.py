@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.routers import summary, topics, inquiries, risk, analysis
+from backend.routers import summary, topics, inquiries, risk, analysis, service_changes
 
 app = FastAPI(title="CS分析エージェント API")
 
@@ -16,3 +16,4 @@ app.include_router(topics.router)
 app.include_router(inquiries.router)
 app.include_router(risk.router)
 app.include_router(analysis.router)
+app.include_router(service_changes.router)
