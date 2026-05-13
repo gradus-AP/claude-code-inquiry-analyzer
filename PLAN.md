@@ -28,8 +28,8 @@ updated: 2026-05-13
 - [x] CLAUDE.md 作成（アーキテクチャ・データ仕様・Agentプロンプト・起動コマンド）
 - [x] `.claude/settings.json` 設定（Stop hook + 読み取り専用コマンド許可）
 - [x] `/cs-data-prep` スキル作成（xlsx→SQLite変換 + topic_ai 8カテゴリ分類）
-- [ ] GitHub リポジトリ作成・ディレクトリ構成作成
-- [ ] `/cs-data-prep` 実行（SQLite生成 + topic_ai 付与）
+- [x] GitHub リポジトリ作成・ディレクトリ構成作成
+- [x] `/cs-data-prep` 実行（SQLite生成 + topic_ai 付与）
 
 ### Phase 1: FastAPI バックエンド（05/13 午後）
 
