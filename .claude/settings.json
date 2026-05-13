@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip list*)",
+      "Bash(pip show *)",
+      "Bash(pip freeze*)",
+      "Bash(npm list*)"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -Command \"[Console]::OutputEncoding = [Text.Encoding]::UTF8; $todos = (Get-Content PLAN.md -Encoding UTF8) | Where-Object { $_ -match '^- \\[ \\]' }; if ($todos.Count -gt 0) { Write-Host '完了したタスクがあれば PLAN.md を [x] に更新してください。'; Write-Host ''; Write-Host ('未完了: ' + $todos.Count + '件'); $todos | Select-Object -First 5 | ForEach-Object { Write-Host $_ }; exit 2 }\""
+          }
+        ]
+      }
+    ]
+  }
+}
