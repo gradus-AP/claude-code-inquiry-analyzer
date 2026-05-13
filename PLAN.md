@@ -33,11 +33,11 @@ updated: 2026-05-13
 
 ### Phase 1: FastAPI バックエンド（05/13 午後）
 
-- [ ] `GET /api/summary`（KPI集計）
-- [ ] `GET /api/topics/trend`（日別集計 + ABC分析ランク付け）
-- [ ] `GET /api/inquiries`（topic / priority / status / days フィルタ）
-- [ ] `GET /api/risk/companies`（解約リスク決定木ロジック）
-- [ ] `POST /api/analysis/start` + `GET /api/analysis/{job_id}`（ジョブ管理）
+- [x] `GET /api/summary`（KPI集計）
+- [x] `GET /api/topics/trend`（日別集計 + ABC分析ランク付け）
+- [x] `GET /api/inquiries`（topic / priority / status / days フィルタ）
+- [x] `GET /api/risk/companies`（解約リスク決定木ロジック）
+- [x] `POST /api/analysis/start` + `GET /api/analysis/{job_id}`（ジョブ管理）
 
 ### Phase 2: React フロントエンド（05/14 午前）
 

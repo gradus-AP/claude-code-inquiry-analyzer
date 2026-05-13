@@ -41,6 +41,26 @@ def main():
     print(f"[READ] {xlsx_path}")
     sheets = pd.read_excel(xlsx_path, sheet_name=None)
 
+    # 日付オフセット: 最新inquiry日 → 今日に揃える
+    inq_dates = pd.to_datetime(sheets["inquiries"]["date"])
+    offset = pd.Timestamp.today().normalize() - inq_dates.max()
+    print(f"[OFFSET] {offset.days}日 シフト（最新データを今日基準に）")
+
+    for col in ["date"]:
+        sheets["inquiries"][col] = (pd.to_datetime(sheets["inquiries"][col]) + offset).dt.strftime("%Y-%m-%d")
+    for col in ["contract_start", "contract_end", "renewal_date"]:
+        sheets["contracts"][col] = (pd.to_datetime(sheets["contracts"][col]) + offset).dt.strftime("%Y-%m-%d")
+    for col in ["date"]:
+        sheets["service_changes"][col] = (pd.to_datetime(sheets["service_changes"][col]) + offset).dt.strftime("%Y-%m-%d")
+    sheets["usage"]["year_month"] = (
+        pd.to_datetime(sheets["usage"]["year_month"] + "-01") + offset
+    ).dt.strftime("%Y-%m")
+
+    # utilization_rate を active_users / licenses から計算
+    usage = sheets["usage"].copy()
+    usage["utilization_rate"] = (usage["active_users"] / usage["licenses"]).round(4)
+    sheets["usage"] = usage
+
     inq = sheets["inquiries"].copy()
     mask = inq["topic_ai"].astype(str).str.contains("Claude Codeが付与", na=False)
     inq.loc[mask, "topic_ai"] = inq.loc[mask, "description"].apply(classify)
