@@ -106,12 +106,16 @@ billing_type == annual?
 
 「{トピック名} を分析して」と言われたら以下を実行:
 
-### Step 1: データ取得
+### Step 1: データ取得 + EDA
+
 ```python
 import sqlite3, pandas as pd
 conn = sqlite3.connect('data/cs_poc.db')
-df = pd.read_sql("""
+
+# 直近90日（トレンド把握用）
+df_90 = pd.read_sql("""
   SELECT i.*, c.billing_type, c.plan, c.renewal_date,
+         CAST(julianday(c.renewal_date) - julianday('now') AS INTEGER) AS days_to_renewal,
          u.utilization_rate
   FROM inquiries i
   JOIN contracts c ON i.company_id = c.company_id
@@ -121,29 +125,66 @@ df = pd.read_sql("""
     WHERE year_month = (SELECT MAX(year_month) FROM usage)
   ) u ON i.company_id = u.company_id
   WHERE i.topic_ai = '{topic}'
-  AND i.date >= date('now', '-28 days')
+  AND i.date >= date('now', '-90 days')
 """, conn)
+
+# 直近28日（集中分析用）
+df_28 = df_90[df_90['date'] >= (pd.Timestamp.today() - pd.Timedelta(days=28)).strftime('%Y-%m-%d')]
+
+# サービス変更ログ（変化点検知用）
+df_changes = pd.read_sql("SELECT * FROM service_changes ORDER BY date", conn)
+conn.close()
+
+# EDA
+print(f"90日件数: {len(df_90)}, 28日件数: {len(df_28)}")
+print(df_28.groupby('priority').size())
+print(df_28.groupby('status').size())
+print(df_28.groupby('billing_type').size())
+print(df_28['satisfaction_score'].describe())
+print(df_28.groupby('company_id').size().sort_values(ascending=False).head(10))
+# 週次トレンド
+df_90['week'] = pd.to_datetime(df_90['date']).dt.to_period('W')
+print(df_90.groupby('week').size())
 ```
 
 ### Step 2: 仮説生成（仮説Agent）
-あなたはカスタマーサポートデータの分析専門家です。
-与えられたトピックの問い合わせ群を横断的に分析し、「なぜこのトピックの問い合わせが増えているか」の仮説を3つ生成してください。
-各仮説には必ず根拠となるデータの傾向を添えること。相関と因果を混同しないこと。
+
+以下のEDA結果を踏まえ、仮説を3つ生成する:
+- 件数推移（週次）を見て「増加・横ばい・減少」を判定する
+- 優先度・ステータス・billing_type の分布から傾向を読む
+- 満足度スコアの低い問い合わせに共通点がないか確認する
+- service_changes の日付と件数の変化点を照合する
+
+各仮説は必ず「データ上の根拠 → 推測される原因」の形式で書く。
+相関と因果を混同しない。根拠がない推測は「不確実」と明示する。
 
 ### Step 3: 仮説検証（検証Agent × 3、並列実行）
-あなたはデータ分析の批判的レビュアーです。
-与えられた仮説をEDAで検証し、支持・棄却・保留のいずれかを判定してください。
-service_changes テーブルの変化点（サービス変更日）との関連を必ず確認すること。不確実な場合は「不確実」と明示すること。
+
+各仮説を独立して検証する。以下を必ず実施:
+1. 仮説を支持・棄却するデータを Python で抽出して数値を示す
+2. service_changes テーブルの変更日前後で件数が変化しているか確認する
+3. 高リスク企業（annual + days_to_renewal<=90 + utilization_rate<0.50）に
+   このトピックの問い合わせが集中していないか確認する
+4. 判定: 支持 / 棄却 / 保留（不確実）のいずれかを明示する
 
 ### Step 4: レポート生成（レポートAgent）
-あなたはCSマネージャーへの提言を作成する専門家です。
-検証済みの仮説を統合し、対策が必要かどうかの判断と推奨アクションをロジックツリー形式で出力してください。
-monthly / annual の緊急度の違いを考慮すること。
+
+検証結果を統合して HTML レポートを生成する。構成:
+1. **エグゼクティブサマリー**（3行以内）
+2. **データ概要**（件数・期間・主要指標）
+3. **仮説検証結果**（支持/棄却/保留 + 根拠データ）
+4. **解約リスクへの影響**（annual/monthly 別の緊急度）
+5. **推奨アクション**（ロジックツリー形式、優先度付き）
+6. **不確実な点**（追加調査が必要な事項）
+
+monthly の問い合わせは即解約に直結しうるため annual より緊急度を高く扱うこと。
 
 ### Step 5: 出力
-- `reports/{job_id}/report.html` にレポートを保存
+
+- `reports/{job_id}/` ディレクトリを作成する
+- `reports/{job_id}/report.html` にレポートを保存（スタンドアロン HTML）
 - `reports/{job_id}/analysis.py` に生成コードを保存（再実行可能にする）
-- 完了後に `http://localhost:3001/report/{job_id}` を提示
+- 完了後に `http://localhost:3000/report/{job_id}` を提示する
 
 ## 分析方針（厳守）
 
