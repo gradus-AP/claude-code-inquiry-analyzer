@@ -1,19 +1,21 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from backend.db import get_conn
 
 router = APIRouter()
 
 
 @router.get("/api/summary")
-def get_summary():
+def get_summary(days: int = Query(default=0)):
     conn = get_conn()
     cur = conn.cursor()
 
-    total = cur.execute("SELECT COUNT(*) FROM inquiries").fetchone()[0]
-    open_ = cur.execute("SELECT COUNT(*) FROM inquiries WHERE status != '解決済み'").fetchone()[0]
-    escalated = cur.execute("SELECT COUNT(*) FROM inquiries WHERE escalated = 1").fetchone()[0]
+    date_filter = f"AND date >= date('now', '-{days} days')" if days > 0 else ""
+
+    total = cur.execute(f"SELECT COUNT(*) FROM inquiries WHERE 1=1 {date_filter}").fetchone()[0]
+    open_ = cur.execute(f"SELECT COUNT(*) FROM inquiries WHERE status != '解決済み' {date_filter}").fetchone()[0]
+    escalated = cur.execute(f"SELECT COUNT(*) FROM inquiries WHERE escalated = 1 {date_filter}").fetchone()[0]
     avg_sat = cur.execute(
-        "SELECT ROUND(AVG(satisfaction_score), 1) FROM inquiries WHERE satisfaction_score IS NOT NULL"
+        f"SELECT ROUND(AVG(satisfaction_score), 1) FROM inquiries WHERE satisfaction_score IS NOT NULL {date_filter}"
     ).fetchone()[0]
 
     # 高リスク企業数（決定木ロジック）
