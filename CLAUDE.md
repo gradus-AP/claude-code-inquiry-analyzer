@@ -93,14 +93,14 @@ cs-agent-poc/
 
 ```
 billing_type == annual?
-├── Yes → days_to_renewal <= 90?
+├── Yes → days_to_renewal <= 28?
 │         ├── Yes → utilization_rate < 0.50? → 🔴高 / 問い合わせ増加中? → 🟡中 / 🟢低
 │         └── No  → 🟢低
 └── No（monthly） → utilization_rate < 0.30?
           ├── Yes → 問い合わせ増加中? → 🔴高 / 🟡中
           └── No  → 🟢低
 ```
-※ 閾値（90日・50%・30%）は初回実測後に調整
+※ 閾値（28日・50%・30%）は初回実測後に調整
 
 ## 分析フロー（Claude Code が実行）
 

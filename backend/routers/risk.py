@@ -47,11 +47,11 @@ def get_risk_companies():
 
 def _score(r: dict) -> tuple[str, str]:
     util = r["utilization_rate"] or 0
-    days = r["days_to_renewal"] or 9999
+    days = r["days_to_renewal"] if r["days_to_renewal"] is not None else 9999
     inq_up = r["inquiry_count_28d"] > 3
 
     if r["billing_type"] == "annual":
-        if days <= 90:
+        if 0 <= days <= 28:
             if util < 0.50:
                 return "高", f"年払い・更新{days}日以内・利用率{util:.0%}"
             elif inq_up:

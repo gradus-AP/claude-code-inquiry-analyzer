@@ -24,6 +24,9 @@ export default function RiskList({ companies }) {
           <div style={{fontSize:'12px',color:'#6b7280',textAlign:'right'}}>
             <div>利用率 {Math.round((c.utilization_rate ?? 0) * 100)}%</div>
             <div>28d問合: {c.inquiry_count_28d}件</div>
+            {c.renewal_date && c.billing_type === 'annual' && (
+              <div style={{color:'#dc2626', fontWeight:600}}>更新 {c.renewal_date}（{c.days_to_renewal}日後）</div>
+            )}
           </div>
         </div>
       ))}
