@@ -12,12 +12,18 @@ def get_inquiries(
     priority: Optional[str] = None,
     status: Optional[str] = None,
     days: int = Query(28, ge=1, le=365),
+    start: Optional[str] = None,
+    end: Optional[str] = None,
 ):
     conn = get_conn()
-    start = (date.today() - timedelta(days=days - 1)).isoformat()
+    if start and end:
+        range_start, range_end = start, end
+    else:
+        range_start = (date.today() - timedelta(days=days - 1)).isoformat()
+        range_end = date.today().isoformat()
 
-    conditions = ["i.date >= ?"]
-    params: list = [start]
+    conditions = ["i.date >= ?", "i.date <= ?"]
+    params: list = [range_start, range_end]
 
     if topic:
         conditions.append("i.topic_ai = ?")

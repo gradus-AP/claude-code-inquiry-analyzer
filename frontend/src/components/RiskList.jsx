@@ -1,8 +1,20 @@
+import { useState } from 'react'
+
+const PAGE_SIZE = 10
+
 export default function RiskList({ companies }) {
+  const [page, setPage] = useState(1)
+
   if (!companies?.length) return <p style={{color:'#9ca3af'}}>データなし</p>
+
+  const filtered = companies.filter(c => c.risk_score !== '低')
+  const total = filtered.length
+  const totalPages = Math.ceil(total / PAGE_SIZE)
+  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
   return (
     <div>
-      {companies.filter(c => c.risk_score !== '低').map(c => (
+      {paged.map(c => (
         <div key={c.company_id} className="risk-item">
           <span className={`risk-badge risk-${c.risk_score}`}>{c.risk_score}</span>
           <div className="risk-info">
@@ -15,6 +27,13 @@ export default function RiskList({ companies }) {
           </div>
         </div>
       ))}
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page === 1}>‹</button>
+          <span className="page-info">{page} / {totalPages}</span>
+          <button onClick={() => setPage(p => Math.min(totalPages, p+1))} disabled={page === totalPages}>›</button>
+        </div>
+      )}
     </div>
   )
 }

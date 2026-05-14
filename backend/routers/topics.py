@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Query
+from typing import Optional
 from backend.db import get_conn
 from datetime import date, timedelta
 
@@ -11,23 +12,50 @@ TOPICS = [
 
 
 @router.get("/api/topics/trend")
-def get_topics_trend(days: int = Query(28, ge=7, le=90)):
+def get_topics_trend(
+    days: int = Query(28, ge=7, le=365),
+    start: Optional[str] = None,
+    end: Optional[str] = None,
+):
     conn = get_conn()
     cur = conn.cursor()
 
-    start = (date.today() - timedelta(days=days - 1)).isoformat()
+    today = date.today()
+    if start and end:
+        start_d    = date.fromisoformat(start)
+        end_d      = date.fromisoformat(end)
+        days       = (end_d - start_d).days + 1
+    else:
+        start_d = today - timedelta(days=days - 1)
+        end_d   = today
 
-    # 日別×トピック集計
+    start      = start_d.isoformat()
+    prev_start = (start_d - timedelta(days=days)).isoformat()
+    prev_end   = (start_d - timedelta(days=1)).isoformat()
+
+    # 当期: 日別×トピック集計
     rows = cur.execute("""
         SELECT topic_ai, date, COUNT(*) as count
         FROM inquiries
-        WHERE date >= ?
+        WHERE date >= ? AND date <= ?
         GROUP BY topic_ai, date
         ORDER BY topic_ai, date
-    """, (start,)).fetchall()
+    """, (start, end_d.isoformat())).fetchall()
+
+    # 前期: トピック別合計のみ
+    prev_rows = cur.execute("""
+        SELECT topic_ai, COUNT(*) as count
+        FROM inquiries
+        WHERE date >= ? AND date <= ?
+        GROUP BY topic_ai
+    """, (prev_start, prev_end)).fetchall()
+    prev_totals: dict[str, int] = {t: 0 for t in TOPICS}
+    for row in prev_rows:
+        if row["topic_ai"] in prev_totals:
+            prev_totals[row["topic_ai"]] = row["count"]
 
     # 日付リスト生成
-    date_range = [(date.today() - timedelta(days=i)).isoformat() for i in range(days - 1, -1, -1)]
+    date_range = [(start_d + timedelta(days=i)).isoformat() for i in range(days)]
 
     # トピック別集計
     daily_map: dict[str, dict[str, int]] = {t: {} for t in TOPICS}
@@ -54,6 +82,7 @@ def get_topics_trend(days: int = Query(28, ge=7, le=90)):
             "topic": t,
             "rank": abc_rank[t],
             "total": totals[t],
+            "prev_total": prev_totals[t],
             "daily": [{"date": d, "count": daily_map[t].get(d, 0)} for d in date_range],
         })
 

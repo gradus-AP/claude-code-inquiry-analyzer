@@ -1,15 +1,25 @@
 from fastapi import APIRouter, Query
+from typing import Optional
 from backend.db import get_conn
 
 router = APIRouter()
 
 
 @router.get("/api/summary")
-def get_summary(days: int = Query(default=0)):
+def get_summary(
+    start: Optional[str] = None,
+    end: Optional[str] = None,
+    days: int = Query(default=0),
+):
     conn = get_conn()
     cur = conn.cursor()
 
-    date_filter = f"AND date >= date('now', '-{days} days')" if days > 0 else ""
+    if start and end:
+        date_filter = f"AND date >= '{start}' AND date <= '{end}'"
+    elif days > 0:
+        date_filter = f"AND date >= date('now', '-{days} days')"
+    else:
+        date_filter = ""
 
     total = cur.execute(f"SELECT COUNT(*) FROM inquiries WHERE 1=1 {date_filter}").fetchone()[0]
     open_ = cur.execute(f"SELECT COUNT(*) FROM inquiries WHERE status != '解決済み' {date_filter}").fetchone()[0]
