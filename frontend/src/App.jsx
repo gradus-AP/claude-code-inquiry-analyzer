@@ -5,6 +5,7 @@ import ABCTable from './components/ABCTable'
 import InquiryTable from './components/InquiryTable'
 import RiskList from './components/RiskList'
 import ServiceChangeLog from './components/ServiceChangeLog'
+import TopicPieChart from './components/TopicPieChart'
 import AnalysisModal from './components/AnalysisModal'
 import ReportList from './components/ReportList'
 
@@ -105,6 +106,12 @@ export default function App() {
               <ABCTable topics={topics} onAnalyze={setAnalysisTopic} />
             </div>
             <div className="card">
+              <h2>トピック別件数（{days}日）</h2>
+              <TopicPieChart topics={topics} />
+            </div>
+          </div>
+          <div className="grid-2">
+            <div className="card">
               <h2>サービス変更ログ</h2>
               <ServiceChangeLog changes={serviceChanges} />
             </div>
@@ -123,6 +130,13 @@ export default function App() {
               <h2>問い合わせトレンド（{days}日）</h2>
               <TrendChart topics={topics} />
             </div>
+            <div className="card">
+              <h2>トピック別件数（{days}日）</h2>
+              <TopicPieChart topics={topics} />
+            </div>
+          </div>
+
+          <div className="grid-2">
             <div className="card">
               <h2>解約リスク企業</h2>
               <RiskList companies={riskCompanies} />
