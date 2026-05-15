@@ -202,7 +202,7 @@ analysis.py の要件:
 ✅ 分析完了
 トピック  : {topic}
 Job ID    : {job_id}
-レポートURL: http://localhost:3000/report/{job_id}
+レポートURL: http://localhost:3000/reports/{job_id}/report.html
 
 【サマリー】
 - 過去28日件数: {N}件

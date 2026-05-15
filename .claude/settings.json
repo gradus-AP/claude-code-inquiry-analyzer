@@ -6,7 +6,8 @@
       "Bash(pip freeze*)",
       "Bash(npm list*)",
       "Bash(python *)",
-      "Bash(cd *)"
+      "Bash(cd * && python *)",
+      "Bash(sqlite3 *)"
     ]
   },
   "hooks": {
