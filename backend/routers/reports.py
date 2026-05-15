@@ -1,26 +1,29 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from pathlib import Path
 import re
+from typing import Optional
 
 router = APIRouter()
 
 REPORTS_DIR = Path(__file__).parent.parent.parent / "reports"
+PAGE_SIZE = 10
 
 
 @router.get("/api/reports")
-def list_reports():
+def list_reports(page: int = Query(1, ge=1), limit: Optional[int] = Query(PAGE_SIZE)):
+    """レポート一覧を created_at 降順で返す（ページネーション対応）"""
     if not REPORTS_DIR.exists():
-        return []
+        return {"reports": [], "total": 0, "page": page, "total_pages": 0}
 
-    result = []
-    for job_dir in sorted(REPORTS_DIR.iterdir(), reverse=True):
+    items = []
+    for job_dir in REPORTS_DIR.iterdir():
         html = job_dir / "report.html"
         if not job_dir.is_dir() or not html.exists():
             continue
 
         text = _read_html(html)
         stat = html.stat()
-        result.append({
+        items.append({
             "job_id": job_dir.name,
             "topic": _extract_topic(text, html.parent.name),
             "period": _extract_period(text),
@@ -35,7 +38,22 @@ def list_reports():
             "url": f"/reports/{job_dir.name}/report.html",
         })
 
-    return result
+    # created_at で降順ソート（新しい順）
+    items.sort(key=lambda x: x["created_at"], reverse=True)
+
+    # ページネーション
+    total = len(items)
+    total_pages = (total + limit - 1) // limit if limit > 0 else 1
+    start_idx = (page - 1) * limit
+    end_idx = start_idx + limit
+    paginated = items[start_idx:end_idx]
+
+    return {
+        "reports": paginated,
+        "total": total,
+        "page": page,
+        "total_pages": total_pages,
+    }
 
 
 def _read_html(html_path: Path) -> str:
