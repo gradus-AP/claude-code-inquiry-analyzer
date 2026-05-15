@@ -81,7 +81,7 @@ export default function AnalysisModal({ topic, days = 28, onClose }) {
           lineHeight: '1.6'
         }}>
           ℹ️ <strong>上のプロンプトをコピーして、Claude Code に貼り付けてください。</strong><br/>
-          分析が完了したら、このウィンドウを閉じてください。
+          分析が完了したら、Claude Code チャット内にレポートリンクが表示されます。
         </div>
 
         {/* フロー図 */}

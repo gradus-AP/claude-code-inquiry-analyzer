@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from backend.db import get_conn
+from db import get_conn
 import uuid, datetime
 
 router = APIRouter()

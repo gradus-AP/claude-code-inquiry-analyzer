@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
-from backend.routers import summary, topics, inquiries, risk, analysis, service_changes, reports
+from routers import summary, topics, inquiries, risk, analysis, service_changes, reports
 
 app = FastAPI(title="CS分析エージェント API")
 
