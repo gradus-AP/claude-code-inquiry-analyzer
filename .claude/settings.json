@@ -7,7 +7,12 @@
       "Bash(npm list*)",
       "Bash(python *)",
       "Bash(cd * && python *)",
-      "Bash(sqlite3 *)"
+      "Bash(sqlite3 *)",
+      "PowerShell(python *)",
+      "PowerShell(cd * && python *)",
+      "PowerShell(python * | *)",
+      "PowerShell($env:* = *)",
+      "PowerShell(Get-Content *)"
     ]
   },
   "hooks": {
